@@ -105,7 +105,7 @@ def upload_to_sheet(sheet_name, data_dict, sorted_dates):
 
 def scrape(selected_codes, max_pages):
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
         context = browser.new_context(java_script_enabled=True, bypass_csp=True)
         context.route("**/*", lambda route, request: route.abort() if request.resource_type == "image" else route.continue_())
         page = context.new_page()
