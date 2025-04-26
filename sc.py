@@ -17,7 +17,7 @@ def upload_to_sheet(sheet_name, data_dict, sorted_dates):
     creds = Credentials.from_service_account_info(info, scopes=scope)
     client = gspread.authorize(creds)
 
-    sheet = client.open(sheet_name)
+    sheet = client.open("DATA HOKI")
     worksheet_title = "HOKI 3D"
 
     try:
