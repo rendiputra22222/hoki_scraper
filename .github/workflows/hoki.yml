@@ -26,4 +26,4 @@ jobs:
       - name: Run Scraper
         env:
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
-        run: python hokisc.py
+        run: python sc.py
