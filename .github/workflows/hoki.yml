@@ -21,12 +21,12 @@ jobs:
           pip install -r requirements.txt
           playwright install --with-deps
 
-      - name: Run Scraper
+      - name: Run sc.py
         env:
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
         run: python sc.py
 
-      - name: Run Scraper
+      - name: Run sc2.py
         env:
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
         run: python sc2.py
