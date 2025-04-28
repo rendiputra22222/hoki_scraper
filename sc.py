@@ -65,7 +65,7 @@ def run(playwright: Playwright) -> None:
     context.route("**/*", lambda route, request: route.abort() if request.resource_type == "image" else route.continue_())
     page = context.new_page()
     page.goto("https://indratogel31303.com/")
-    page.get_by_role("button", name="Close").click()
+    #page.get_by_role("button", name="Close").click()
 
     page.get_by_role("textbox", name="Username").fill("kucingbuta")
     page.get_by_role("textbox", name="Password").fill("Basokikil6")
