@@ -65,7 +65,6 @@ def run(playwright: Playwright) -> None:
     context.route("**/*", lambda route, request: route.abort() if request.resource_type == "image" else route.continue_())
     page = context.new_page()
     page.goto("https://indratogel31303.com/")
-    #page.get_by_role("button", name="Close").click()
 
     page.get_by_role("textbox", name="Username").fill("kucingbuta")
     page.get_by_role("textbox", name="Password").fill("Basokikil6")
@@ -107,5 +106,20 @@ def run(playwright: Playwright) -> None:
     context.close()
     browser.close()
 
-with sync_playwright() as playwright:
-    run(playwright)
+def safe_run():
+    MAX_RETRIES = 3
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            with sync_playwright() as playwright:
+                run(playwright)
+            break  # keluar jika sukses
+        except Exception as e:
+            print(f"❌ Percobaan {attempt} gagal: {e}")
+            if attempt == MAX_RETRIES:
+                print("🚫 Gagal setelah 3 kali percobaan.")
+            else:
+                print("🔁 Mencoba ulang dalam 3 detik...")
+                time.sleep(3)
+
+if __name__ == "__main__":
+    safe_run()
