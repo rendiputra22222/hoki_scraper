@@ -17,8 +17,8 @@ def upload_to_sheet(sheet_name, data_dict, sorted_dates):
     creds = Credentials.from_service_account_info(info, scopes=scope)
     client = gspread.authorize(creds)
 
-    sheet = client.open("DATA HOKI")
-    worksheet_title = "HOKI 3D"
+    sheet = client.open("SHARE")
+    worksheet_title = "HOKI 4D"
 
     try:
         worksheet = sheet.worksheet(worksheet_title)
@@ -65,7 +65,6 @@ def run(playwright: Playwright) -> None:
     context.route("**/*", lambda route, request: route.abort() if request.resource_type == "image" else route.continue_())
     page = context.new_page()
     page.goto("https://indratogel31303.com/")
-    #page.get_by_role("button", name="Close").click()
 
     page.get_by_role("textbox", name="Username").fill("kucingbuta")
     page.get_by_role("textbox", name="Password").fill("Basokikil6")
@@ -89,7 +88,7 @@ def run(playwright: Playwright) -> None:
             continue
         datetime_str = cols[0].inner_text().strip()
         nomor_full = cols[3].inner_text().strip()
-        nomor = nomor_full[-3:]  # Ambil 3 digit terakhir
+        nomor = nomor_full[-4:]  # Ambil 4 digit terakhir
 
         try:
             dt = datetime.strptime(datetime_str, "%d-%m-%Y %H:%M:%S")
@@ -107,5 +106,20 @@ def run(playwright: Playwright) -> None:
     context.close()
     browser.close()
 
-with sync_playwright() as playwright:
-    run(playwright)
+def safe_run():
+    MAX_RETRIES = 3
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            with sync_playwright() as playwright:
+                run(playwright)
+            break  # keluar jika sukses
+        except Exception as e:
+            print(f"❌ Percobaan {attempt} gagal: {e}")
+            if attempt == MAX_RETRIES:
+                print("🚫 Gagal setelah 3 kali percobaan.")
+            else:
+                print("🔁 Mencoba ulang dalam 3 detik...")
+                time.sleep(3)
+
+if __name__ == "__main__":
+    safe_run()
