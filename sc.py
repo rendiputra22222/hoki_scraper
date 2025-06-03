@@ -7,7 +7,7 @@ from playwright.sync_api import Playwright, sync_playwright
 import gspread
 from google.oauth2.service_account import Credentials
 
-def upload_to_sheet(sheet_name, data_dict, sorted_dates):
+def upload_to_sheet(spreadsheet_name, worksheet_title, data_dict, sorted_dates):
     creds_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
     if not creds_json:
         raise ValueError("GOOGLE_CREDENTIALS_JSON not found in environment variables")
@@ -17,8 +17,7 @@ def upload_to_sheet(sheet_name, data_dict, sorted_dates):
     creds = Credentials.from_service_account_info(info, scopes=scope)
     client = gspread.authorize(creds)
 
-    sheet = client.open("SHARE")
-    worksheet_title = "HOKI 4D"
+    sheet = client.open(spreadsheet_name)
 
     try:
         worksheet = sheet.worksheet(worksheet_title)
@@ -74,7 +73,7 @@ def run(playwright: Playwright) -> None:
     page.get_by_role("link", name=" History Nomor").click()
     page.get_by_role("link", name="HOKIDRAW", exact=True).click()
 
-    # Tunggu tabel muncul dengan data tanggal valid
+    # Tunggu tabel muncul
     page.wait_for_selector("table#listhistory tbody tr td:nth-child(1):has-text('-')")
     time.sleep(2)
 
@@ -88,7 +87,7 @@ def run(playwright: Playwright) -> None:
             continue
         datetime_str = cols[0].inner_text().strip()
         nomor_full = cols[3].inner_text().strip()
-        nomor = nomor_full[-4:]  # Ambil 4 digit terakhir
+        nomor = nomor_full[-4:]
 
         try:
             dt = datetime.strptime(datetime_str, "%d-%m-%Y %H:%M:%S")
@@ -100,9 +99,13 @@ def run(playwright: Playwright) -> None:
             print(f"Error parsing: {datetime_str} -> {e}")
 
     tanggal_terbaru = sorted(tanggal_set, reverse=True)[:10]
-    upload_to_sheet("Hasil Togel", data, tanggal_terbaru)
 
-    print("✅ Data berhasil diupload ke Google Sheet.")
+    # Upload ke dua spreadsheet
+    upload_to_sheet("master", "HOKI 4D", data, tanggal_terbaru)
+    upload_to_sheet("SHARE", "HOKI 4D", data, tanggal_terbaru)
+    upload_to_sheet("PRIBADI", "HOKI 4D", data, tanggal_terbaru)
+
+    print("✅ Data berhasil diupload ke Google Sheets: master & SHARE.")
     context.close()
     browser.close()
 
@@ -112,7 +115,7 @@ def safe_run():
         try:
             with sync_playwright() as playwright:
                 run(playwright)
-            break  # keluar jika sukses
+            break
         except Exception as e:
             print(f"❌ Percobaan {attempt} gagal: {e}")
             if attempt == MAX_RETRIES:
@@ -123,3 +126,4 @@ def safe_run():
 
 if __name__ == "__main__":
     safe_run()
+
