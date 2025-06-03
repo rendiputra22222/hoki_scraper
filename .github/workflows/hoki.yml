@@ -39,10 +39,4 @@ jobs:
       - name: Run sc2.py
         env:
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
-        run: python sc2.py
-        continue-on-error: true
-
-      - name: Run sc.py
-        env:
-          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
         run: python sc.py
