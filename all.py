@@ -45,14 +45,16 @@ def extract_first_page(page, pasaran_name, data, all_dates):
 def write_to_spreadsheet(data, sorted_dates):
     creds_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
     if not creds_json:
-        print("❌ GOOGLE_CREDENTIALS_JSON tidak ditemukan.")
-        return
+        raise ValueError("❌ GOOGLE_CREDENTIALS_JSON tidak ditemukan.")
 
     creds_dict = json.loads(creds_json)
-    scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+    scopes = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
     credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
-
     gc = gspread.authorize(credentials)
+
     sh = gc.open("PASAR MALAM")
     worksheet = sh.worksheet("All")
 
@@ -86,7 +88,7 @@ def write_to_spreadsheet(data, sorted_dates):
                     row_data[col_idx] = result
             worksheet.append_row(row_data)
 
-    print("✅ Data berhasil ditambahkan ke Google Sheet tanpa menghapus data lama.")
+    print("✅ Data berhasil diupload ke Google Sheets: PASAR MALAM > All")
 
 def scrape_all():
     with sync_playwright() as p:
