@@ -36,7 +36,13 @@ jobs:
           pip install --prefer-binary -r requirements.txt
           playwright install
 
-      - name: Run sc2.py
+      - name: Run sc.py
         env:
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
         run: python sc.py
+        continue-on-error: true
+
+      - name: Run all.py
+        env:
+          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+        run: python all.py
