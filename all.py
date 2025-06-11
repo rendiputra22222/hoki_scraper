@@ -69,24 +69,32 @@ def write_to_spreadsheet(data, sorted_dates):
         header_map = {col: i for i, col in enumerate(header)}
 
     pasaran_rows = {row[0]: i + 2 for i, row in enumerate(existing_data[1:])}
+    updates = []
 
     for pasaran, values in data.items():
         if pasaran in pasaran_rows:
             row_idx = pasaran_rows[pasaran]
-            for tanggal, result in values.items():
-                col_idx = header_map.get(tanggal)
-                if col_idx is not None:
-                    current = worksheet.cell(row_idx, col_idx + 1).value
-                    if not current:
-                        worksheet.update_cell(row_idx, col_idx + 1, result)
+            row_data = existing_data[row_idx - 1] if row_idx - 1 < len(existing_data) else []
         else:
+            row_idx = len(existing_data) + len(updates) + 2
             row_data = [""] * len(header)
             row_data[0] = pasaran
-            for tanggal, result in values.items():
-                col_idx = header_map.get(tanggal)
-                if col_idx is not None:
-                    row_data[col_idx] = result
-            worksheet.append_row(row_data)
+
+        if len(row_data) < len(header):
+            row_data += [""] * (len(header) - len(row_data))
+
+        updated = False
+        for tanggal, result in values.items():
+            col_idx = header_map.get(tanggal)
+            if col_idx is not None and not row_data[col_idx]:
+                row_data[col_idx] = result
+                updated = True
+
+        if updated:
+            updates.append((row_idx, row_data))
+
+    for row_idx, row in updates:
+        worksheet.update(f"A{row_idx}", [row])
 
     print("✅ Data berhasil diupload ke Google Sheets: PASAR MALAM > All")
 
